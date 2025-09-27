@@ -1,32 +1,3 @@
-// Enhanced Portfolio JavaScript with Modern Features
-
-// Theme Toggle Functionality
-const themeToggle = document.getElementById('theme-toggle');
-const body = document.body;
-
-// Check for saved theme preference or default to light mode
-const currentTheme = localStorage.getItem('theme') || 'light';
-body.setAttribute('data-theme', currentTheme);
-
-// Update theme toggle icon
-function updateThemeIcon(theme) {
-    const icon = themeToggle.querySelector('i');
-    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-}
-
-// Initialize theme
-updateThemeIcon(currentTheme);
-
-// Theme toggle event listener
-themeToggle.addEventListener('click', () => {
-    const currentTheme = body.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    body.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeIcon(newTheme);
-});
-
 // Mobile Navigation Toggle
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('nav-menu');
@@ -68,17 +39,6 @@ window.addEventListener('scroll', () => {
         navbar.style.background = 'rgba(255, 255, 255, 0.95)';
         navbar.style.boxShadow = 'none';
     }
-    
-    // Dark theme navbar
-    if (body.getAttribute('data-theme') === 'dark') {
-        if (window.scrollY > 50) {
-            navbar.style.background = 'rgba(17, 24, 39, 0.98)';
-            navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.3)';
-        } else {
-            navbar.style.background = 'rgba(17, 24, 39, 0.95)';
-            navbar.style.boxShadow = 'none';
-        }
-    }
 });
 
 // Active navigation link highlighting
@@ -103,16 +63,6 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// Skills Progress Bar Animation
-function animateProgressBars() {
-    const progressBars = document.querySelectorAll('.progress-bar');
-    
-    progressBars.forEach(bar => {
-        const width = bar.getAttribute('data-width');
-        bar.style.width = width;
-    });
-}
-
 // Intersection Observer for animations
 const observerOptions = {
     threshold: 0.1,
@@ -124,18 +74,13 @@ const observer = new IntersectionObserver((entries) => {
         if (entry.isIntersecting) {
             entry.target.style.opacity = '1';
             entry.target.style.transform = 'translateY(0)';
-            
-            // Animate progress bars when skills section is visible
-            if (entry.target.classList.contains('skills')) {
-                setTimeout(animateProgressBars, 500);
-            }
         }
     });
 }, observerOptions);
 
 // Observe elements for animation
 document.addEventListener('DOMContentLoaded', () => {
-    const animateElements = document.querySelectorAll('.skill-category, .project-card, .stat, .library-card, .azure-category');
+    const animateElements = document.querySelectorAll('.skill-category, .project-card, .stat');
     
     animateElements.forEach(el => {
         el.style.opacity = '0';
@@ -145,10 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Enhanced Contact Form Handling
+// Contact form handling
 const contactForm = document.querySelector('.contact-form');
 if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
+    contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
         // Get form data
@@ -160,86 +105,32 @@ if (contactForm) {
         
         // Simple validation
         if (!name || !email || !subject || !message) {
-            showNotification('Please fill in all fields.', 'error');
+            alert('Please fill in all fields.');
             return;
         }
         
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            showNotification('Please enter a valid email address.', 'error');
+            alert('Please enter a valid email address.');
             return;
         }
         
-        // Show loading state
+        // Simulate form submission
         const submitBtn = contactForm.querySelector('button[type="submit"]');
-        const btnText = submitBtn.querySelector('.btn-text');
-        const btnLoading = submitBtn.querySelector('.btn-loading');
+        const originalText = submitBtn.textContent;
         
-        btnText.style.display = 'none';
-        btnLoading.style.display = 'inline-flex';
+        submitBtn.textContent = 'Sending...';
         submitBtn.disabled = true;
         
         // Simulate API call
-        try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            showNotification('Thank you for your message! I\'ll get back to you soon.', 'success');
+        setTimeout(() => {
+            alert('Thank you for your message! I\'ll get back to you soon.');
             contactForm.reset();
-        } catch (error) {
-            showNotification('Sorry, there was an error sending your message. Please try again.', 'error');
-        } finally {
-            btnText.style.display = 'inline';
-            btnLoading.style.display = 'none';
+            submitBtn.textContent = originalText;
             submitBtn.disabled = false;
-        }
+        }, 2000);
     });
-}
-
-// Notification System
-function showNotification(message, type = 'info') {
-    // Remove existing notifications
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notification => notification.remove());
-    
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    
-    // Add styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        z-index: 10000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        max-width: 400px;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Animate in
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-    }, 100);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        notification.style.transform = 'translateX(100%)';
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
 }
 
 // Typing animation for hero title
@@ -282,7 +173,7 @@ window.addEventListener('scroll', () => {
 // Skill items hover effect
 document.querySelectorAll('.skill-item').forEach(item => {
     item.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-5px) scale(1.02)';
+        this.style.transform = 'translateY(-5px) scale(1.05)';
     });
     
     item.addEventListener('mouseleave', function() {
@@ -322,7 +213,7 @@ function createScrollToTop() {
         right: 30px;
         width: 50px;
         height: 50px;
-        background: var(--primary-color);
+        background: #2563eb;
         color: white;
         border: none;
         border-radius: 50%;
@@ -368,48 +259,12 @@ window.addEventListener('load', () => {
     }, 100);
 });
 
-// Add CSS for scroll to top button and notifications
+// Add CSS for scroll to top button
 const style = document.createElement('style');
 style.textContent = `
     .scroll-to-top:hover {
-        background: var(--secondary-color) !important;
+        background: #1d4ed8 !important;
         transform: translateY(-2px) !important;
-    }
-    
-    .notification-content {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .notification-content i {
-        font-size: 1.2rem;
-    }
-    
-    .btn-loading {
-        display: none;
-        align-items: center;
-        gap: 0.5rem;
     }
 `;
 document.head.appendChild(style);
-
-// Performance optimization: Debounce scroll events
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Apply debouncing to scroll events
-const debouncedScrollHandler = debounce(() => {
-    // Your scroll handling code here
-}, 10);
-
-window.addEventListener('scroll', debouncedScrollHandler);
